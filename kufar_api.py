@@ -42,23 +42,30 @@ class SearchConfig:
             self.api_type = 'cre_api'
 
 
+from urllib.parse import urlparse, parse_qs
 
 class Core:
-    def __init__(self):
-        self.url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
-        self.params = {
-            'query': '',
-            'ot': 1,
-            'cat': 17010,  # search category
-            'size': 200,  # max size = 200
-            'lang': 'ru',
-            'cursor': '',  # page token (set here next page token from paginagion dict in response)
+    # def init(self):
+    #     self.requests = []
 
-        }
     def get_data(self):
-        response = requests.get(self.url, self.params)
+        pass
+
+    def _get_from_cre_api(self, params):
+        api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
+        response = requests.get(api_url, params)
         print(response.content.decode())
+
+    def _get_from_auto_api(self, params):
+        api_url = 'https://auto.kufar.by/api/search/ads-search/v1/engine/v1/search/rendered-paginated'
+        response = requests.get(api_url, params)
+        print(response.content.decode())
+
+    def extract_params_from_url(self, url):
+        parsed_url = urlparse(url)
+        return parse_qs(parsed_url.query)
+
 
 if __name__ == "__main__":
     my_core = Core()
-    my_core.get_data()
+    print(my_core.extract_params_from_url('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar='))
