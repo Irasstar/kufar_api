@@ -43,16 +43,15 @@ class SearchConfig:
 
 
 class Core:
-    # def init(self):
-    #     self.requests = []
 
-    def get_data(self, url, query='', params={}):
-        if query != '':
-            params['query'][0] = query
-        if 'auto.kufar.by' in url:
-            self._get_from_auto_api(params)
-        else:
-            self._get_from_cre_api(params)
+    def get_data(self, search_settings: SearchConfig, search_request=''):
+        if search_request is not '':
+            search_settings.params['query'][0] = search_request
+        if 'cre_api' in search_settings.api_type:
+            return self._get_from_cre_api(search_settings.params)
+        elif 'auto' in search_settings.api_type:
+            return self._get_from_auto_api(search_settings.params)
+
 
     def _get_from_cre_api(self, params):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
@@ -64,9 +63,10 @@ class Core:
         response = requests.get(api_url, params)
         return response.content.decode()
 
-    def extract_params_from_url(self, url):
-        parsed_url = urlparse(url)
-        return parse_qs(parsed_url.query)
+    def get_search_settings(self, url):
+        config = SearchConfig()
+        config.configure(url)
+        return config
 
     def get_ads_count(self):
         pass
@@ -77,4 +77,6 @@ class Core:
 
 if __name__ == "__main__":
     my_core = Core()
-    print(my_core.extract_params_from_url('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar='))
+    conf = my_core.get_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
+    print(my_core.get_data(conf))
+    pass
