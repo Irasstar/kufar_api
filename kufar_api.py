@@ -31,22 +31,33 @@ class Core:
     # def init(self):
     #     self.requests = []
 
-    def get_data(self):
-        pass
+    def get_data(self, url, query='', params={}):
+        if query != '':
+            params['query'][0] = query
+        if 'auto.kufar.by' in url:
+            self._get_from_auto_api(params)
+        else:
+            self._get_from_cre_api(params)
 
     def _get_from_cre_api(self, params):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
         response = requests.get(api_url, params)
-        print(response.content.decode())
+        return response.content.decode()
 
     def _get_from_auto_api(self, params):
         api_url = 'https://auto.kufar.by/api/search/ads-search/v1/engine/v1/search/rendered-paginated'
         response = requests.get(api_url, params)
-        print(response.content.decode())
+        return response.content.decode()
 
     def extract_params_from_url(self, url):
         parsed_url = urlparse(url)
         return parse_qs(parsed_url.query)
+
+    def get_ads_count(self):
+        pass
+
+    def get_image(self, image_id):
+        pass
 
 
 if __name__ == "__main__":
