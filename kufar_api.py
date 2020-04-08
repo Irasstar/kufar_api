@@ -47,40 +47,44 @@ class SearchConfig:
 
 
 class Core:
+    def __init__(self):
+        self.settings = SearchConfig()
 
-    def get_data(self, search_settings: SearchConfig, search_request=''):
+    def get_data(self, search_request=''):
         if search_request is not '':
-            search_settings.params['query'][0] = search_request
-        if 'cre_api' in search_settings.api_type:
-            return self._get_from_cre_api(search_settings.params)
-        elif 'auto' in search_settings.api_type:
-            return self._get_from_auto_api(search_settings.params)
+            self.settings.params['query'][0] = search_request
+        if 'cre_api' in self.settings.api_type:
+            return self._get_from_cre_api()
+        elif 'auto' in self.settings.api_type:
+            return self._get_from_auto_api()
 
-
-    def _get_from_cre_api(self, params):
+    def _get_from_cre_api(self):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
-        response = requests.get(api_url, params)
+        response = requests.get(api_url, self.settings.params)
         return response.content.decode()
 
-    def _get_from_auto_api(self, params):
+    def _get_from_auto_api(self):
         api_url = 'https://auto.kufar.by/api/search/ads-search/v1/engine/v1/search/rendered-paginated'
-        response = requests.get(api_url, params)
+        response = requests.get(api_url, self.settings.params)
         return response.content.decode()
 
-    def get_search_settings(self, url):
-        config = SearchConfig()
-        config.configure(url)
-        return config
+    def set_search_settings(self, url):
+        self.settings.configure(url)
 
-    def get_ads_count(self):
+    def get_ads_count(self, search_request=''):
+        api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/count'
+        response = requests.get(api_url, self.settings.params)
+        return response.content.decode()
+
+    def get_small_image(self, image_id):
         pass
 
-    def get_image(self, image_id):
+    def get_full_size_image(self, image_id):
         pass
 
 
 if __name__ == "__main__":
     my_core = Core()
-    conf = my_core.get_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
-    print(my_core.get_data(conf))
-    pass
+    my_core.set_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
+    print(my_core.get_ads_count('audi'))
+
