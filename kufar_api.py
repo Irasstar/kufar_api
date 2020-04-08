@@ -36,6 +36,7 @@ class SearchConfig:
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
+        self.params['size'] = ['200']
         if 'auto.kufar' in url_with_settings:
             self.api_type = 'auto'
         else:
