@@ -37,7 +37,7 @@ class SearchConfig:
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
-        self.params['size'] = ['200']
+        self.params['size'] = ['20']
         if 'auto.kufar' in url_with_settings:
             self.api_type = 'auto'
             self.search_api_url = 'https://auto.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
@@ -55,12 +55,18 @@ class Core:
     def get_ads(self, search_request=''):
         """request self.params['size'] ads"""
         if search_request is not '':
-            self.settings.params['query'][0] = search_request
+            self.settings.params.update({'query': [search_request]})
         response = requests.get(self.settings.search_api_url, self.settings.params)
         return response.content.decode()
 
     def get_all_ads(self, search_request=''):
-        ads_count = self.get_ads_count()
+        # ads_count = self.get_ads_count(search_request)
+        # self.settings.params.update({"cursor": ["eyJ0IjoiYWJzIiwiZiI6dHJ1ZSwicCI6Mn0="]})
+        response = self.get_ads(search_request)
+
+        # ads_count = storage.
+        # next_page_token = storage['']
+        return None
 
     def set_search_settings(self, url):
         self.settings.configure(url)
@@ -79,6 +85,6 @@ class Core:
 
 if __name__ == "__main__":
     my_core = Core()
-    my_core.set_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
-    print(my_core.get_ads('audi'))
+    my_core.set_search_settings('https://www.kufar.by/listings?ot=1&rgn=7&cat=5040')
+    print(my_core.get_all_ads('ps4'))
 
