@@ -25,6 +25,22 @@
 # /51/ - first two number of image name
 
 import requests
+from urllib.parse import urlparse, parse_qs
+
+
+class SearchConfig:
+    def __init__(self):
+        self.params = {}
+        self.api_type = ''
+
+    def configure(self, url_with_settings):
+        parsed_url = urlparse(url_with_settings)
+        self.params = parse_qs(parsed_url.query)
+        if 'auto.kufar' in url_with_settings:
+            self.api_type = 'auto'
+        else:
+            self.api_type = 'cre_api'
+
 
 
 class Core:
