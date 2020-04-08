@@ -32,6 +32,7 @@ class SearchConfig:
     def __init__(self):
         self.params = {}
         self.api_type = ''
+        self.search_api_url = ''
 
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
@@ -50,6 +51,7 @@ class Core:
         self.settings = SearchConfig()
 
     def get_ads(self, search_request=''):
+        """request self.params['size'] ads"""
         if search_request is not '':
             self.settings.params['query'][0] = search_request
         response = requests.get(self.settings.search_api_url, self.settings.params)
