@@ -32,7 +32,6 @@ class SearchConfig:
     def __init__(self):
         self.params = {}
         self.api_type = ''
-        self.search_api_url = ''
 
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
