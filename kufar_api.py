@@ -47,6 +47,8 @@ class SearchConfig:
 
 
 class Core:
+    """First of all, call configure function to set search settings(category, subcategory, region, price range etc).
+    Configure function takes url with config query string(take it from kufar.by after setting all search parameters)"""
     def __init__(self):
         self.settings = SearchConfig()
 
@@ -58,7 +60,7 @@ class Core:
         return response.content.decode()
 
     def get_all_ads(self, search_request=''):
-        pass
+        ads_count = self.get_ads_count()
 
     def set_search_settings(self, url):
         self.settings.configure(url)
