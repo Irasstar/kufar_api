@@ -47,13 +47,16 @@ class Core:
     def __init__(self):
         self.settings = SearchConfig()
 
-    def get_data(self, search_request=''):
+    def get_ads(self, search_request=''):
         if search_request is not '':
             self.settings.params['query'][0] = search_request
         if 'cre_api' in self.settings.api_type:
             return self._get_from_cre_api()
         elif 'auto' in self.settings.api_type:
             return self._get_from_auto_api()
+
+    def get_all_ads(self, search_request=''):
+        pass
 
     def _get_from_cre_api(self):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
