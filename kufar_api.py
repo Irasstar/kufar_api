@@ -42,8 +42,6 @@ class SearchConfig:
             self.api_type = 'cre_api'
 
 
-from urllib.parse import urlparse, parse_qs
-
 class Core:
     # def init(self):
     #     self.requests = []
