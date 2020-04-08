@@ -32,6 +32,7 @@ class SearchConfig:
     def __init__(self):
         self.params = {}
         self.api_type = ''
+        self.search_api_url = ''
 
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
@@ -39,8 +40,10 @@ class SearchConfig:
         self.params['size'] = ['200']
         if 'auto.kufar' in url_with_settings:
             self.api_type = 'auto'
+            self.search_api_url = 'https://auto.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
         else:
             self.api_type = 'cre_api'
+            self.search_api_url = 'https://cre_api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
 
 
 class Core:
