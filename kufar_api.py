@@ -45,6 +45,20 @@ class SearchConfig:
             self.api_type = 'cre_api'
             self.search_api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
 
+    @staticmethod
+    def get_user_info_url(user_id):
+        return f'https://www.kufar.by/item/api/aduserinfo/{user_id}'
+
+    @staticmethod
+    def get_small_size_image_url(image_id):
+        str_image_id = str(image_id)
+        return f'https://yams.kufar.by/api/v1/kufar-ads/images/{str_image_id[:2]}/{str_image_id}.jpg?rule=line_thumbs'
+
+    @staticmethod
+    def get_full_size_image_url(image_id):
+        str_image_id = str(image_id)
+        return f'https://yams.kufar.by/api/v1/kufar-ads/images/{str_image_id[:2]}/{str_image_id}.jpg?rule=gallery'
+
 
 class Core:
     def __init__(self):
@@ -79,4 +93,3 @@ if __name__ == "__main__":
     my_core = Core()
     my_core.set_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
     print(my_core.get_ads('audi'))
-
