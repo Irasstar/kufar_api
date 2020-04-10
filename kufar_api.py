@@ -106,6 +106,7 @@ class Core:
 
 
 if __name__ == "__main__":
+    #blablabla
     my_core = Core()
     my_core.set_search_settings('https://www.kufar.by/listings?ot=1&rgn=7&cat=5040')
     print(my_core.get_all_ads('ps4'))
