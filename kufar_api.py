@@ -37,7 +37,7 @@ class SearchConfig:
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
-        self.params['size'] = ['20']
+        self.params['size'] = ['20']  # page include max 200 ads
         if 'auto.kufar' in url_with_settings:
             self.api_type = 'auto'
             self.search_api_url = 'https://auto.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
@@ -52,21 +52,26 @@ class Core:
     def __init__(self):
         self.settings = SearchConfig()
 
-    def get_ads(self, search_request=''):
+    def get_ads_page(self, search_request=''):
         """request self.params['size'] ads"""
         if search_request is not '':
             self.settings.params.update({'query': [search_request]})
         response = requests.get(self.settings.search_api_url, self.settings.params)
-        return response.content.decode()
+        return response.json()
 
-    def get_all_ads(self, search_request=''):
-        # ads_count = self.get_ads_count(search_request)
-        # self.settings.params.update({"cursor": ["eyJ0IjoiYWJzIiwiZiI6dHJ1ZSwicCI6Mn0="]})
-        response = self.get_ads(search_request)
-
-        # ads_count = storage.
-        # next_page_token = storage['']
-        return None
+    def get_all_ads(self, search_request='', pages_count=-1):
+        content = []
+        while True:
+            response = self.get_ads_page(search_request)
+            content.extend(response['ads'])
+            next_page_not_exists = True
+            for page in response['pagination']['pages']:
+                if page['label'] == 'next':
+                    self.settings.params['cursor'] = page['token']
+                    next_page_not_exists = False
+            if next_page_not_exists:
+                del self.settings.params['cursor']
+                return content
 
     def set_search_settings(self, url):
         self.settings.configure(url)
@@ -74,7 +79,7 @@ class Core:
     def get_ads_count(self, search_request=''):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/count'
         response = requests.get(api_url, self.settings.params)
-        return response.content.decode()
+        return response.json()
 
     def get_small_image(self, image_id):
         pass
