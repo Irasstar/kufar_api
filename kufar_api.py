@@ -147,8 +147,7 @@ class Core:
         self.settings.configure(url)
 
     def get_ads_count(self, search_request=''):
-        api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/count'
-        response = requests.get(api_url, self.settings.params)
+        response = requests.get(self.settings.ads_count_api_url, self.settings.params)
         return response.json()
 
     def get_user_info(self, user_id):
@@ -162,4 +161,7 @@ class Core:
 
 
 if __name__ == "__main__":
-    pass
+    #blablabla
+    my_core = Core()
+    my_core.set_search_settings('https://www.kufar.by/listings?size=42&sort=lst.d&cur=BYR&prn=14000&rgn=5&prc=r%3A1000%2C5000&cnd=1&cmp=0&oph=1')
+    print(my_core.get_all_ads(''))
