@@ -26,6 +26,7 @@
 
 import requests
 from urllib.parse import urlparse, parse_qs
+import re
 
 
 class SearchConfig:
@@ -33,17 +34,20 @@ class SearchConfig:
         self.params = {}
         self.api_type = ''
         self.search_api_url = ''
+        self.ads_count_api_url = ''
 
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
         self.params['size'] = ['200']
+        # main api url configure
         if 'auto.kufar' in url_with_settings:
             self.api_type = 'auto'
             self.search_api_url = 'https://auto.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
         else:
             self.api_type = 'cre_api'
             self.search_api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
+        self.ads_count_api_url = re.sub(r'(rendered-paginated)', 'count', self.search_api_url)
 
     @staticmethod
     def get_user_info_url(user_id):
