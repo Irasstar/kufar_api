@@ -70,15 +70,26 @@ class Core:
     def __init__(self):
         self.settings = SearchConfig()
 
-    def get_ads(self, search_request=''):
-        """request self.params['size'] ads"""
+    def get_ads_page(self, search_request=''):
+        """function request json with self.params['size'] ads"""
         if search_request is not '':
-            self.settings.params['query'][0] = search_request
+            self.settings.params.update({'query': [search_request]})
         response = requests.get(self.settings.search_api_url, self.settings.params)
-        return response.content.decode()
+        return response.json()
 
-    def get_all_ads(self, search_request=''):
-        pass
+    def get_all_ads(self, search_request='', pages_count=-1):
+        content = []
+        while True:
+            response = self.get_ads_page(search_request)
+            content.extend(response['ads'])
+            next_page_not_exists = True
+            for page in response['pagination']['pages']:
+                if page['label'] == 'next':
+                    self.settings.params.update({'cursor': [page['token']]})
+                    next_page_not_exists = False
+            if next_page_not_exists:
+                del self.settings.params['cursor']
+                return content
 
     def set_search_settings(self, url):
         self.settings.configure(url)
@@ -86,7 +97,10 @@ class Core:
     def get_ads_count(self, search_request=''):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/count'
         response = requests.get(api_url, self.settings.params)
-        return response.content.decode()
+        return response.json()
+
+    def get_user_info(self, user_id):
+        pass
 
     def get_small_image(self, image_id):
         pass
@@ -96,6 +110,7 @@ class Core:
 
 
 if __name__ == "__main__":
+    #blablabla
     my_core = Core()
-    my_core.set_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
-    print(my_core.get_ads('audi'))
+    my_core.set_search_settings('https://www.kufar.by/listings?size=42&sort=lst.d&cur=BYR&prn=14000&rgn=5&prc=r%3A1000%2C5000&cnd=1&cmp=0&oph=1')
+    print(my_core.get_all_ads(''))
