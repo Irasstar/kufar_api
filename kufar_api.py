@@ -105,7 +105,7 @@ class Core:
         self.settings = SearchConfig()
 
     def get_ads_page(self, search_request=''):
-        """function request json with self.params['size'] ads"""
+        """function requests json with self.params['size'] ads"""
         if search_request is not '':
             self.settings.params.update({'query': [search_request]})
         response = requests.get(self.settings.search_api_url, self.settings.params)
@@ -129,8 +129,7 @@ class Core:
         self.settings.configure(url)
 
     def get_ads_count(self, search_request=''):
-        api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/count'
-        response = requests.get(api_url, self.settings.params)
+        response = requests.get(self.settings.ads_count_api_url, self.settings.params)
         return response.json()
 
     def get_user_info(self, user_id):
