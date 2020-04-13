@@ -26,6 +26,7 @@
 
 import requests
 from urllib.parse import urlparse, parse_qs
+import re
 
 
 class SearchConfig:
@@ -33,17 +34,20 @@ class SearchConfig:
         self.params = {}
         self.api_type = ''
         self.search_api_url = ''
+        self.ads_count_api_url = ''
 
     def configure(self, url_with_settings):
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
-        self.params['size'] = ['200']  # you can request max 200 ads in single time
+        self.params['size'] = ['200']
+        # main api url configure
         if 'auto.kufar' in url_with_settings:
             self.api_type = 'auto'
             self.search_api_url = 'https://auto.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
         else:
             self.api_type = 'cre_api'
             self.search_api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
+        self.ads_count_api_url = re.sub(r'(rendered-paginated)', 'count', self.search_api_url)
 
     @staticmethod
     def get_user_info_url(user_id):
@@ -66,26 +70,15 @@ class Core:
     def __init__(self):
         self.settings = SearchConfig()
 
-    def get_ads_page(self, search_request=''):
-        """function request json with self.params['size'] ads"""
+    def get_ads(self, search_request=''):
+        """request self.params['size'] ads"""
         if search_request is not '':
-            self.settings.params.update({'query': [search_request]})
+            self.settings.params['query'][0] = search_request
         response = requests.get(self.settings.search_api_url, self.settings.params)
-        return response.json()
+        return response.content.decode()
 
-    def get_all_ads(self, search_request='', pages_count=-1):
-        content = []
-        while True:
-            response = self.get_ads_page(search_request)
-            content.extend(response['ads'])
-            next_page_not_exists = True
-            for page in response['pagination']['pages']:
-                if page['label'] == 'next':
-                    self.settings.params.update({'cursor': [page['token']]})
-                    next_page_not_exists = False
-            if next_page_not_exists:
-                del self.settings.params['cursor']
-                return content
+    def get_all_ads(self, search_request=''):
+        pass
 
     def set_search_settings(self, url):
         self.settings.configure(url)
@@ -93,10 +86,7 @@ class Core:
     def get_ads_count(self, search_request=''):
         api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/count'
         response = requests.get(api_url, self.settings.params)
-        return response.json()
-
-    def get_user_info(self, user_id):
-        pass
+        return response.content.decode()
 
     def get_small_image(self, image_id):
         pass
@@ -106,9 +96,6 @@ class Core:
 
 
 if __name__ == "__main__":
-    #blablabla
     my_core = Core()
-    my_core.set_search_settings('https://www.kufar.by/listings?ot=1&rgn=7&cat=5040')
-    print(my_core.get_all_ads('ps4'))
-    print('next request')
-    print(my_core.get_all_ads('ps4'))
+    my_core.set_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
+    print(my_core.get_ads('audi'))
