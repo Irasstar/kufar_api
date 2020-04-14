@@ -144,7 +144,4 @@ class Core:
 
 
 if __name__ == "__main__":
-    #blablabla
-    my_core = Core()
-    my_core.set_search_settings('https://www.kufar.by/listings?query=%D0%B0%D1%83%D0%B4%D0%B8&ot=1&rgn=7&ar=')
-    print(my_core.get_ads('audi'))
+    pass
