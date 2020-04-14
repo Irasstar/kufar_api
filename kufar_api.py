@@ -150,20 +150,31 @@ class Core:
         response = requests.get(self.settings.ads_count_api_url)
         return response.json()
 
-    def get_user_info(self, user_id):
-        user_info_url = self.settings.get_user_info_url(user_id)
+    def get_ad_owner_info(self, user_id):
+        user_info_url = self.settings.get_ad_owner_info_url(user_id)
         response = requests.get(user_info_url)
         return response.json()
 
-    def get_small_image(self, image_id):
-        image_url = self.settings.get_small_size_image_url(image_id)
-        response = requests.get(image_url)
+    def get_user_profile_info(self, user_id):
+        user_info_url = self.settings.get_user_profile_info_url(user_id)
+        response = requests.get(user_info_url)
+        return response.json()
+
+    def get_small_ad_image(self, image_id, is_yams_storage=True):
+        response = requests.get(self.settings.get_small_image_url(image_id, is_yams_storage))
         return response.content
 
-    def get_full_size_image(self, image_id):
-        image_url = self.settings.get_full_size_image_url(image_id)
-        response = requests.get(image_url)
+    def get_large_ad_image(self, image_id, is_yams_storage=True):
+        response = requests.get(self.settings.get_large_image_url(image_id, is_yams_storage))
         return response.content
+
+    def get_user_avatar(self, avatar_image_id):
+        response = requests.get(self.settings.get_user_avatar_url(avatar_image_id))
+        return response.content
+
+    def get_current_user_ads(self, user_id):
+        response = requests.get(self.settings.get_user_ads_url(user_id))
+        return response.json()
 
 
 if __name__ == "__main__":
