@@ -36,7 +36,10 @@ class SearchConfig:
         self.search_api_url = ''
         self.ads_count_api_url = ''
 
+# >>> ads search request configuration part starts
+
     def configure(self, url_with_settings):
+        # init ads search settings (category, cost etc)
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
         self.params['size'] = ['200']
@@ -49,19 +52,50 @@ class SearchConfig:
             self.search_api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
         self.ads_count_api_url = re.sub(r'(rendered-paginated)', 'count', self.search_api_url)
 
+# <<< ads search request configuration part finish
+
+# >>> user urls part starts
     @staticmethod
-    def get_user_info_url(user_id):
+    def get_ad_owner_info_url(user_id):
+        # response difference is user ads count and avatar id instead direct link in get_user_profile_info
         return f'https://www.kufar.by/item/api/aduserinfo/{user_id}'
 
     @staticmethod
-    def get_small_size_image_url(image_id):
+    def get_user_profile_info_url(user_id):
+        # I think this request is useless except "communication info"
+        return f'https://profile-api.trust-pro.mpi-internal.com/profile/sdrn:kufar:user:{user_id}'
+
+# <<< user urls part finish
+
+# ads + images part start
+    @staticmethod
+    def get_user_avatar_url(image_id):
         str_image_id = str(image_id)
-        return f'https://yams.kufar.by/api/v1/kufar-ads/images/{str_image_id[:2]}/{str_image_id}.jpg?rule=line_thumbs'
+        return f'https://content.kufar.by/prc_thumbs/{str_image_id[:2]}/{str_image_id}.jpg'
 
     @staticmethod
-    def get_full_size_image_url(image_id):
+    def get_user_ads_url(user_id):
+        return f'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated' \
+               f'?size=200&sort=lst.d&atid={user_id}&lang=ru'
+
+    @staticmethod
+    def get_small_image_url(image_id, is_yams_storage=True):
         str_image_id = str(image_id)
-        return f'https://yams.kufar.by/api/v1/kufar-ads/images/{str_image_id[:2]}/{str_image_id}.jpg?rule=gallery'
+        if is_yams_storage:
+            return f'https://yams.kufar.by/api/v1/kufar-ads/images/{str_image_id[:2]}/{str_image_id}.jpg' \
+                   f'?rule=line_thumbs'
+        else:
+            return f'https://content.kufar.by/mobile_thumbs/{str_image_id[:2]}/{str_image_id}.jpg'
+
+    @staticmethod
+    def get_large_image_url(image_id, is_yams_storage=True):
+        str_image_id = str(image_id)
+        if is_yams_storage:
+            return f'https://yams.kufar.by/api/v1/kufar-ads/images/{str_image_id[:2]}/{str_image_id}.jpg?rule=gallery'
+        else:
+            return f'https://content.kufar.by/gallery/{str_image_id[:2]}/{str_image_id}.jpg'
+
+# <<< ads part + images finish
 
 
 class Core:
