@@ -129,17 +129,23 @@ class Core:
         self.settings.configure(url)
 
     def get_ads_count(self, search_request=''):
-        response = requests.get(self.settings.ads_count_api_url, self.settings.params)
+        response = requests.get(self.settings.ads_count_api_url)
         return response.json()
 
     def get_user_info(self, user_id):
-        pass
+        user_info_url = self.settings.get_user_info_url(user_id)
+        response = requests.get(user_info_url)
+        return response.json()
 
     def get_small_image(self, image_id):
-        pass
+        image_url = self.settings.get_small_size_image_url(image_id)
+        response = requests.get(image_url)
+        return response.content
 
     def get_full_size_image(self, image_id):
-        pass
+        image_url = self.settings.get_full_size_image_url(image_id)
+        response = requests.get(image_url)
+        return response.content
 
 
 if __name__ == "__main__":
