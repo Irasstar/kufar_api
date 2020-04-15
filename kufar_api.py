@@ -105,7 +105,7 @@ class Core:
         self.settings = SearchConfig()
 
     def get_ads_page(self, search_request=''):
-        """function request json with self.params['size'] ads"""
+        """function requests json with self.params['size'] ads"""
         if search_request is not '':
             self.settings.params.update({'query': [search_request]})
         response = requests.get(self.settings.search_api_url, self.settings.params)
