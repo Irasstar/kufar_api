@@ -29,6 +29,12 @@ from urllib.parse import urlparse, parse_qs
 import re
 
 
+class WrongArgsCombinationError(Exception):
+    """raises when you set wrong combination of a function parameters"""
+    def __str__(self):
+        return 'Be careful! Set wrong combination of function args.'
+
+
 class SearchConfig:
     def __init__(self):
         self.params = {}
@@ -105,27 +111,35 @@ class Core:
         self.settings = SearchConfig()
 
     def get_ads_page(self, search_request=''):
-        """function request json with self.params['size'] ads"""
+        """function requests json with self.params['size'] ads. By default page size is 200 ads"""
         if search_request is not '':
             self.settings.params.update({'query': [search_request]})
         response = requests.get(self.settings.search_api_url, self.settings.params)
         return response.json()
 
-    def get_all_ads(self, search_request='', pages_count=-1):
+    def get_all_ads(self, search_request='', force_get_all_ads=False):
+        """Search_request variable sets as (query=) parameter in query string. Be careful with this bk
+        if you set force_get_all_ads = True without query string, you will download all ads from
+        kufar dashboard (it can be about 900 000 ads)"""
         content = []
-        while True:
-            response = self.get_ads_page(search_request)
-            content.extend(response['ads'])
-            next_page_not_exists = True
-            for page in response['pagination']['pages']:
-                if page['label'] == 'next':
-                    self.settings.params.update({'cursor': [page['token']]})
-                    next_page_not_exists = False
-            if next_page_not_exists:
-                del self.settings.params['cursor']
-                return content
+        if search_request or self.settings.params.get('query') not in ('', None) or force_get_all_ads:
+            while True:
+                response = self.get_ads_page(search_request)
+                content.extend(response['ads'])
+                next_page_not_exists = True
+                for page in response['pagination']['pages']:
+                    if page['label'] == 'next':
+                        self.settings.params.update({'cursor': [page['token']]})
+                        next_page_not_exists = False
+                if next_page_not_exists:
+                    if self.settings.params.get('cursor') is not None:
+                        del self.settings.params['cursor']
+                    return content
+        else:
+            raise WrongArgsCombinationError
 
     def set_search_settings(self, url):
+        """The function get url with search parameters. Search query (query=) parameter is an optional. """
         self.settings.configure(url)
 
     def get_ads_count(self, search_request=''):
