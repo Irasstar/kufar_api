@@ -32,7 +32,7 @@ import re
 class WrongArgsCombinationError(Exception):
     """raises when you set wrong combination of a function parameters"""
     def __str__(self):
-        return 'Be careful! Set wrong combination of function args.'
+        return 'Be careful! Wrong combination of function args.'
 
 
 class SearchConfig:
@@ -112,68 +112,73 @@ class Core:
     """First of all, call configure function to set search settings(category, subcategory, region, price range etc).
     Configure function takes url with config query string(take it from kufar.by after setting all search parameters)"""
     def __init__(self):
-        self.settings = SearchConfig()
+        self.__settings = SearchConfig()
 
-    def get_ads_page(self, search_request=''):
-        """function requests json with self.params['size'] ads. By default page size is 200 ads"""
-        if search_request is not '':
-            self.settings.params.update({'query': [search_request]})
-        response = requests.get(self.settings.search_api_url, self.settings.params)
+    def get_ads_page(self, search_request='', page_cursor=''):
+        """function requests json with self.__settings.params['size'] ads. By default page size is 200 ads
+        search_request - the thing you are search
+        page_cursor - next page id. It use in get_all_ads function"""
+        params = self.__settings.params
+        params.update({'query': [search_request], 'cursor': [page_cursor]})
+        response = requests.get(self.__settings.search_api_url, params)
         return response.json()
 
     def get_all_ads(self, search_request='', force_get_all_ads=False):
         """Search_request variable sets as (query=) parameter in query string. Be careful with this bk
         if you set force_get_all_ads = True without query string, you will download all ads from
-        kufar dashboard (it can be about 900 000 ads)"""
+        kufar dashboard (it can be about 900 000 ads)
+        search_request - the thing you are search
+        force_get_all_ads - get ads without search_request - all ads from current category"""
         content = []
-        if search_request or self.settings.params.get('query') not in ('', None) or force_get_all_ads:
+        page_cursor = ''
+        if search_request != '' or force_get_all_ads:
             while True:
-                response = self.get_ads_page(search_request)
-                content.extend(response['ads'])
+                response = self.get_ads_page(search_request, page_cursor)
+                content.extend(response.get('ads'))
                 next_page_not_exists = True
                 for page in response['pagination']['pages']:
-                    if page['label'] == 'next':
-                        self.settings.params.update({'cursor': [page['token']]})
+                    if page.get('label') == 'next':
+                        page_cursor = page.get('token')
                         next_page_not_exists = False
                 if next_page_not_exists:
-                    if self.settings.params.get('cursor') is not None:
-                        del self.settings.params['cursor']
                     return content
         else:
             raise WrongArgsCombinationError
 
     def set_search_settings(self, url):
-        """The function get url with search parameters. Search query (query=) parameter is an optional."""
-        self.settings.configure(url)
+        """The function get url with search parameters and save category settings for following search"""
+        self.__settings.configure(url)
 
     def get_ads_count(self, search_request=''):
-        response = requests.get(self.settings.ads_count_api_url)
+        params = self.__settings.params
+        params.update({'query': search_request})
+        response = requests.get(self.__settings.ads_count_api_url, params)
         return response.json()
 
     def get_ad_owner_info(self, user_id):
-        user_info_url = self.settings.get_ad_owner_info_url(user_id)
+        user_info_url = self.__settings.get_ad_owner_info_url(user_id)
         response = requests.get(user_info_url)
         return response.json()
 
     def get_user_profile_info(self, user_id):
-        user_info_url = self.settings.get_user_profile_info_url(user_id)
+        user_info_url = self.__settings.get_user_profile_info_url(user_id)
         response = requests.get(user_info_url)
         return response.json()
 
     def get_small_ad_image(self, image_id, is_yams_storage=True):
-        response = requests.get(self.settings.get_small_image_url(image_id, is_yams_storage))
+        response = requests.get(self.__settings.get_small_image_url(image_id, is_yams_storage))
         return response.content
 
     def get_large_ad_image(self, image_id, is_yams_storage=True):
-        response = requests.get(self.settings.get_large_image_url(image_id, is_yams_storage))
+        response = requests.get(self.__settings.get_large_image_url(image_id, is_yams_storage))
         return response.content
 
     def get_user_avatar(self, avatar_image_id):
-        response = requests.get(self.settings.get_user_avatar_url(avatar_image_id))
+        response = requests.get(self.__settings.get_user_avatar_url(avatar_image_id))
         return response.content
 
     def get_current_user_ads(self, user_id):
-        response = requests.get(self.settings.get_user_ads_url(user_id))
+        response = requests.get(self.__settings.get_user_ads_url(user_id))
         return response.json()
 
 
