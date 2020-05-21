@@ -48,6 +48,9 @@ class SearchConfig:
         # init ads search settings (category, cost etc)
         parsed_url = urlparse(url_with_settings)
         self.params = parse_qs(parsed_url.query)
+        # exclude search query from config.
+        if self.params.get('query') is not None:
+            del self.params['query']
         self.params['size'] = ['200']
         # main api url configure
         if 'auto.kufar' in url_with_settings:
@@ -56,6 +59,7 @@ class SearchConfig:
         else:
             self.api_type = 'cre_api'
             self.search_api_url = 'https://cre-api.kufar.by/ads-search/v1/engine/v1/search/rendered-paginated'
+        # set ads count URL
         self.ads_count_api_url = re.sub(r'(rendered-paginated)', 'count', self.search_api_url)
 
 # <<< ads search request configuration part finish
@@ -139,7 +143,7 @@ class Core:
             raise WrongArgsCombinationError
 
     def set_search_settings(self, url):
-        """The function get url with search parameters. Search query (query=) parameter is an optional. """
+        """The function get url with search parameters. Search query (query=) parameter is an optional."""
         self.settings.configure(url)
 
     def get_ads_count(self, search_request=''):
