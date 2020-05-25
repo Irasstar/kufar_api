@@ -1,23 +1,11 @@
-<h2>kufar api</h2>
-<h4>Core module</h4>
-<p>Task: core send <b>single</b> request to kufar server and return ads list</p>
-<p>Input parameters</p>
-<ul>
-<li>search request</li>
-<li>search settings (categories, etc)</li>
-</ul>
-<p>Output data</p>
-<ul>
-<li>ads data for single request</li>
-</ul>
-<h4>Automation module</h4>
-<p>Task: module uses core for automation send requests</p>
-<p>Input parameters</p>
-<ul>
-<li>requests list</li>
-<li>base search setting</li>
-</ul>
-<p>Output data</p>
-<ul>
-<li>lists of lists with ads data</li>
-</ul>
+<p><strong>Kufar API</strong></p>
+<hr />
+<p>Модуль разработан для доступа к базе объявлений сайта kufar.by посредством обращения к его API. Официальная документация по API отсутствует т.к. он не является публичным.</p>
+<hr />
+<p>Модуль состоит из двух классов: <strong>Core</strong> и <strong>SearchConfig</strong>.</p>
+<hr />
+<p><strong>Класс SearchConfig</strong>.</p>
+<p>Класс занимается формированием URL адресов и хранит настройки поиска.</p>
+<hr />
+<p><strong>Класс Core</strong>.</p>
+<p>Класс хранит в себе экземпляр класса SearchConfig и использует его методы для формирования необходимых URL запросов, сконфигурированных в зависимости от запросов пользователя. После получения сконфигурированных запросов экземпляр класса Core производит запрос к API kufar.by и возвращает полученную информацию: список объявлений(json), изображения, информацию о разместившем объявление(включая номера телефонов). Также имеется возможность просмотреть все объявления конкретного пользователя</p>
