@@ -109,7 +109,7 @@ class SearchConfig:
 
 
 class Core:
-    """First of all, call configure function to set search settings(category, subcategory, region, price range etc).
+    """First of all, call configure function for setting search parameters(category, subcategory, region, price range etc).
     Configure function takes url with config query string(take it from kufar.by after setting all search parameters)"""
     def __init__(self):
         self.__settings = SearchConfig()
@@ -136,6 +136,8 @@ class Core:
                 response = self.get_ads_page(search_request, page_cursor)
                 content.extend(response.get('ads'))
                 next_page_not_exists = True
+                if response['pagination'] is None:
+                    return []
                 for page in response['pagination']['pages']:
                     if page.get('label') == 'next':
                         page_cursor = page.get('token')
